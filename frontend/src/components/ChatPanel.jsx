@@ -1,22 +1,12 @@
 import { useEffect, useState } from "react";
-import { socket } from "../socket";
 
 export default function ChatPanel({ roomCode, username, setUsername }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
 
-  useEffect(() => {
-    const handler = (msg) => {
-      setMessages((prev) => [...prev, msg]);
-    };
-    socket.on("chat_message", handler);
-    return () => socket.off("chat_message", handler);
-  }, []);
-
   function sendMessage() {
     if (!input.trim()) return;
     const message = { user: username || "Anonymous", text: input };
-    socket.emit("chat_message", { room_code: roomCode, ...message });
     setMessages((prev) => [...prev, message]);
     setInput("");
   }

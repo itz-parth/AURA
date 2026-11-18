@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Plus, LogIn, User, Play } from "lucide-react";
-import { socket } from "../socket";
 
 export default function Nexus() {
   const navigate = useNavigate();

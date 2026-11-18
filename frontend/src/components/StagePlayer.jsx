@@ -1,26 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import YouTube from "react-youtube";
-import { socket } from "../socket";
 
-export default function StagePlayer({ roomCode, isHost }) {
+export default function StagePlayer({ roomCode, isHost, nowPlaying, onReady }) {
   const [videoId, setVideoId] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const playerRef = useRef(null);
-
-  useEffect(() => {
-    const onSync = (playback) => {
-      setVideoId(playback.videoId);
-      setIsPlaying(playback.isPlaying);
-      if (!isHost && playerRef.current && playerRef.current.internalPlayer) {
-        const p = playerRef.current.internalPlayer;
-        if (playback.isPlaying) p.playVideo();
-        else p.pauseVideo();
-        if (playback.videoId) p.loadVideoById(playback.videoId);
-      }
-    };
-    socket.on("playback_synced", onSync);
-    return () => socket.off("playback_synced", onSync);
-  }, [isHost]);
 
   const opts = {
     height: "360",
@@ -37,12 +21,26 @@ export default function StagePlayer({ roomCode, isHost }) {
     if (!isHost) return;
     const playing = event.data === 1;
     setIsPlaying(playing);
-    socket.emit("sync_playback", {
-      room_code: roomCode,
-      user_id: "host",
-      playback: { videoId, isPlaying: playing },
-    });
   };
+
+  const handleYouTubeReady = (event) => {
+    if (onReady) onReady(event.target);
+    if (nowPlaying && nowPlaying.videoId) {
+      setVideoId(nowPlaying.videoId);
+      setIsPlaying(true);
+      const p = event.target;
+      p.loadVideoById(nowPlaying.videoId, 0);
+    }
+  };
+
+  useEffect(() => {
+    if (!nowPlaying || !playerRef.current) return;
+    const p = playerRef.current.internalPlayer;
+    if (p.getVideoData && p.getVideoData().video_id !== nowPlaying.videoId) {
+      p.loadVideoById(nowPlaying.videoId, 0);
+      setVideoId(nowPlaying.videoId);
+    }
+  }, [nowPlaying]);
 
   return (
     <div className="space-y-4">
@@ -57,6 +55,7 @@ export default function StagePlayer({ roomCode, isHost }) {
             videoId={videoId}
             opts={opts}
             onStateChange={onStateChange}
+            onReady={handleYouTubeReady}
             ref={playerRef}
           />
         )}

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { socket } from "../socket";
 import { Search, Music, Play } from "lucide-react";
 
 export default function QueuePanel({ roomCode, isHost }) {
@@ -8,17 +7,13 @@ export default function QueuePanel({ roomCode, isHost }) {
   const [queue, setQueue] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const handler = (q) => setQueue(q);
-    socket.on("queue_synced", handler);
-    return () => socket.off("queue_synced", handler);
-  }, []);
-
   async function searchMusic() {
     if (!query.trim()) return;
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8000/music/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(
+        `http://localhost:8000/music/search?q=${encodeURIComponent(query)}`
+      );
       const data = await res.json();
       setResults(data);
     } catch (err) {
@@ -32,7 +27,11 @@ export default function QueuePanel({ roomCode, isHost }) {
     if (!isHost) return;
     const newQueue = [...queue, track];
     setQueue(newQueue);
-    socket.emit("sync_queue", { room_code: roomCode, user_id: "host", queue: newQueue });
+    fetch(`http://localhost:8000/rooms/${roomCode}/queue`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(track),
+    }).catch((err) => console.error(err));
   }
 
   return (
@@ -83,7 +82,9 @@ export default function QueuePanel({ roomCode, isHost }) {
         )}
       </div>
       <div className="mt-4 p-3 bg-white/5 rounded-lg border border-white/5">
-        <h3 className="text-xs font-bold text-white/70 uppercase tracking-wider mb-2">Current Queue ({queue.length})</h3>
+        <h3 className="text-xs font-bold text-white/70 uppercase tracking-wider mb-2">
+          Current Queue ({queue.length})
+        </h3>
         <div className="space-y-1">
           {queue.map((t, i) => (
             <div key={i} className="flex items-center gap-2 text-xs text-white/70">
