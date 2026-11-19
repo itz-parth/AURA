@@ -1,88 +1,174 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { Plus, LogIn, User, Play } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+
+import FloatingDock from "../components/FloatingDock";
+import JoinFrequencyModal from "../components/JoinFrequencyModal";
+import MusicDiscovery from "../components/MusicDiscovery";
+import TrendingSocial from "../components/TrendingSocial";
+
+const HERO_ARTWORK = [
+  {
+    id: "main",
+    image:
+      "https://images.unsplash.com/photo-1493225253777-836379e98652?w=600&h=600&fit=crop",
+    w: "w-64 h-64",
+    top: "top-24",
+    left: "left-1/2 -translate-x-1/2",
+    delay: "0s",
+  },
+  {
+    id: "top-left",
+    image:
+      "https://images.unsplash.com/photo-1470225620779-d306dcc4205d?w=320&h=320&fit=crop",
+    w: "w-40 h-40",
+    top: "top-10 left-10",
+    left: "",
+    delay: "0.5s",
+  },
+  {
+    id: "top-right",
+    image:
+      "https://images.unsplash.com/photo-1511379938447-cd7fda5b91c8?w=320&h=320&fit=crop",
+    w: "w-40 h-40",
+    top: "top-16 right-10",
+    left: "",
+    delay: "1s",
+  },
+  {
+    id: "bottom-left",
+    image:
+      "https://images.unsplash.com/photo-1459749411477-64901fa6d24e?w=280&h=280&fit=crop",
+    w: "w-32 h-32",
+    top: "bottom-24 left-12",
+    left: "",
+    delay: "1.5s",
+  },
+  {
+    id: "bottom-right",
+    image:
+      "https://images.unsplash.com/photo-1507544847470-9391c684604c?w=300&h=300&fit=crop",
+    w: "w-48 h-48",
+    top: "bottom-20 right-12",
+    left: "",
+    delay: "2s",
+  },
+];
 
 export default function Nexus() {
   const navigate = useNavigate();
-  const { token } = useAuth();
-  const [code, setCode] = useState("");
-  const [error, setError] = useState("");
-
-  async function createRoom() {
-    setError("");
-    try {
-      const res = await fetch("http://localhost:8000/rooms/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || "Failed to create room");
-      navigate(`/stage/${data.code}`);
-    } catch (err) {
-      setError(err.message);
-    }
-  }
-
-  async function joinRoom() {
-    setError("");
-    try {
-      const res = await fetch(`http://localhost:8000/rooms/${code}`);
-      if (!res.ok) throw new Error("Room not found");
-      navigate(`/stage/${code}`);
-    } catch (err) {
-      setError(err.message);
-    }
-  }
+  const location = useLocation();
+  const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#050505] p-6">
-      <div className="glass px-8 py-12 rounded-2xl shadow-2xl w-full max-w-md text-center space-y-8">
-        <div className="w-16 h-16 bg-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Play className="w-8 h-8 text-purple-400 mx-auto" />
-        </div>
-        <h1 className="text-3xl font-bold tracking-tight">Aura</h1>
-        <p className="text-white/50 text-lg">Listen Together</p>
+    <div className="min-h-screen relative overflow-hidden text-white">
+      {/* Ambient lighting background */}
+      <div className="ambient-light" />
 
-        <button
-          onClick={createRoom}
-          className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-purple-900/20"
-        >
-          <Plus className="w-5 h-5" />
-          Start a Frequency
-        </button>
+      {/* Decorative floating orbs */}
+      <div
+        className="absolute top-1/4 left-1/4 w-96 h-96 bg-aura-pink/20 rounded-full blur-3xl floating"
+        style={{ animationDelay: "0s" }}
+      />
+      <div
+        className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-aura-purple/20 rounded-full blur-3xl floating floating-delay-1"
+        style={{ animationDelay: "2s" }}
+      />
+      <div
+        className="absolute top-1/3 right-1/5 w-64 h-64 bg-aura-cyan/15 rounded-full blur-2xl floating floating-delay-2"
+        style={{ animationDelay: "4s" }}
+      />
 
-        <div className="space-y-3">
-          <label className="text-left text-sm text-white/70 font-medium">
-            Join by Code
-          </label>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              maxLength={6}
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-              placeholder="123456"
-              className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-3 text-white text-center text-xl focus:outline-none focus:ring-2 focus:ring-purple-500 uppercase tracking-widest"
-            />
-            <button
-              onClick={joinRoom}
-              className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-semibold transition"
-            >
-              <LogIn className="w-4 h-4 mr-2" />
-              Join
-            </button>
-          </div>
-          {error && <p className="text-left text-red-400 text-sm">{error}</p>}
-        </div>
+      <main className="relative z-10 pt-20 pb-32 px-6 lg:px-12">
+        {/* Hero section */}
+        <section className="relative max-w-7xl mx-auto min-h-[70vh] flex flex-col lg:flex-row items-center justify-between gap-12 px-4 lg:px-0">
+          {/* Left: text content */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="flex-1 max-w-[560px] z-10"
+          >
+            <span className="inline-block px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-aura-pink mb-6">
+              YOUR MUSIC. YOUR PEOPLE. YOUR FREQUENCY.
+            </span>
+            <h1 className="text-5xl lg:text-7xl font-bold tracking-tight leading-tight mb-6 text-gradient">
+              Music sounds better together.
+            </h1>
+            <p className="text-white/60 text-lg lg:text-xl mb-10 leading-relaxed">
+              Find your people, share your favourite tracks and get lost in
+              music together.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={() => setModalOpen(true)}
+                className="btn-gradient text-white font-bold py-5 px-10 rounded-full flex items-center justify-center gap-3 text-lg hover:scale-105 transition-transform"
+              >
+                JOIN THE FREQUENCY <ArrowRight className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => navigate("/login")}
+                className="py-5 px-10 rounded-full bg-white/5 border border-white/10 text-white font-semibold hover:bg-white/10 transition-all"
+              >
+                Already have an account?
+              </button>
+            </div>
+          </motion.div>
 
-        <div className="border-t border-white/10 mt-8 pt-6 text-white/50 text-sm">
-          <User className="w-4 h-4 inline mr-2" /> Host controls queue &amp; playback
-        </div>
-      </div>
+          {/* Right: artwork composition */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+            className="flex-1 relative h-[520px] lg:h-[640px] flex items-center justify-center z-10"
+          >
+            {HERO_ARTWORK.map((art) => (
+              <motion.div
+                key={art.id}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  y: [0, -10, 0],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  repeatType: "mirror",
+                  delay: parseFloat(art.delay),
+                }}
+                className={`absolute rounded-2xl overflow-hidden shadow-2xl border border-white/10 ${art.w} ${art.top} ${art.left} group`}
+              >
+                <img
+                  src={art.image}
+                  alt={`Artwork ${art.id}`}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#080A16]/80 to-transparent opacity-60" />
+              </motion.div>
+            ))}
+            {/* Central glowing accent */}
+            <div className="absolute w-20 h-20 rounded-full bg-gradient-to-tr from-aura-pink to-aura-purple opacity-80 blur-xl animate-pulse" />
+          </motion.div>
+        </section>
+
+        {/* Music discovery section */}
+        <MusicDiscovery />
+
+        {/* Trending + social listening preview */}
+        <TrendingSocial />
+      </main>
+
+      {/* Floating navigation dock */}
+      <FloatingDock active={location.pathname} />
+
+      {/* Join the Frequency modal */}
+      <JoinFrequencyModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+      />
     </div>
   );
 }
