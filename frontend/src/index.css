@@ -1,14 +1,16 @@
 @import "tailwindcss";
+@import "./auth.css";
 
 @theme {
   --color-background: #080A16;
   --color-foreground: #ffffff;
-
-  /* AURA accent palette */
   --color-aura-pink: #F52C9B;
   --color-aura-purple: #A45BFF;
   --color-aura-cyan: #55D9F5;
   --color-aura-navy: #080A16;
+  --color-aura-bg: #070914;
+  --color-aura-panel: rgba(18, 19, 42, 0.76);
+  --color-aura-muted: rgba(231, 231, 255, 0.62);
 }
 
 @layer base {
@@ -25,7 +27,6 @@
   }
 }
 
-/* Glassmorphism variants */
 .glass {
   @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-xl;
 }
@@ -38,7 +39,6 @@
   @apply bg-white/7 backdrop-blur-[24px] border border-white/14 rounded-[2.5rem] shadow-[0_0_40px_rgba(245,44,155,0.15)];
 }
 
-/* Gradient text utilities */
 .text-gradient {
   background: linear-gradient(135deg, #F52C9B 0%, #A45BFF 50%, #55D9F5 100%);
   -webkit-background-clip: text;
@@ -46,7 +46,6 @@
   background-clip: text;
 }
 
-/* Gradient button */
 .btn-gradient {
   background: linear-gradient(135deg, #F52C9B 0%, #A45BFF 100%);
   box-shadow: 0 0 24px rgba(164, 91, 255, 0.35);
@@ -58,7 +57,6 @@
   filter: brightness(1.1);
 }
 
-/* Ambient lighting backgrounds */
 .ambient-light {
   position: fixed;
   inset: 0;
@@ -78,7 +76,6 @@
   50% { background-position: 100% 100%; }
 }
 
-/* Floating decorative movement */
 @keyframes float {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   50% { transform: translateY(-12px) rotate(2deg); }
@@ -96,7 +93,6 @@
   animation: float 8s ease-in-out infinite 2s;
 }
 
-/* Gentle pulse for glowing elements */
 @keyframes glow-pulse {
   0%, 100% { box-shadow: 0 0 24px rgba(245, 44, 155, 0.35), 0 0 48px rgba(164, 91, 255, 0.25); }
   50% { box-shadow: 0 0 36px rgba(245, 44, 155, 0.55), 0 0 72px rgba(164, 91, 255, 0.4); }
@@ -106,7 +102,6 @@
   animation: glow-pulse 4s ease-in-out infinite;
 }
 
-/* Entrance fade + scale */
 @keyframes entrance {
   from { opacity: 0; transform: translateY(14px) scale(0.97); }
   to { opacity: 1; transform: translateY(0) scale(1); }
@@ -116,7 +111,6 @@
   animation: entrance 0.7s ease-out forwards;
 }
 
-/* Modal entrance */
 @keyframes modal-in {
   from { opacity: 0; transform: scale(0.92); }
   to { opacity: 1; transform: scale(1); }

@@ -17,42 +17,42 @@ const TRACKS = [
     id: 1,
     title: "Midnight Drive",
     artist: "Luna Wave",
-    image: "https://images.unsplash.com/photo-1493225253777-836379e98652?w=400&h=400&fit=crop",
+    image: "/nexus/track-vinyl.webp",
     color: "from-aura-pink to-aura-purple",
   },
   {
     id: 2,
     title: "Neon Nights",
     artist: "Synth City",
-    image: "https://images.unsplash.com/photo-1470225620779-d306dcc4205d?w=400&h=400&fit=crop",
+    image: "/nexus/track-turntable.webp",
     color: "from-aura-cyan to-aura-purple",
   },
   {
     id: 3,
     title: "Velvet Room",
     artist: "Mira",
-    image: "https://images.unsplash.com/photo-1459749411477-64901fa6d24e?w=400&h=400&fit=crop",
+    image: "/nexus/track-concert.webp",
     color: "from-aura-purple to-aura-pink",
   },
   {
     id: 4,
     title: "Cloud Nine",
     artist: "Skylar",
-    image: "https://images.unsplash.com/photo-1511379938447-cd7fda5b91c8?w=400&h=400&fit=crop",
+    image: "/nexus/track-studio.webp",
     color: "from-aura-cyan to-aura-pink",
   },
   {
     id: 5,
     title: "Echo Chamber",
     artist: "Vibe Theory",
-    image: "https://images.unsplash.com/photo-1507544847470-9391c684604c?w=400&h=400&fit=crop",
+    image: "/nexus/track-pianist.webp",
     color: "from-aura-pink to-aura-cyan",
   },
   {
     id: 6,
     title: "Starlight",
     artist: "Orbit",
-    image: "https://images.unsplash.com/photo-1465101043530-73397c63e70a?w=400&h=400&fit=crop",
+    image: "/nexus/track-crowd.webp",
     color: "from-aura-purple to-aura-cyan",
   },
 ];
@@ -77,7 +77,6 @@ export default function MusicDiscovery() {
           </div>
         </div>
 
-        {/* Category pills */}
         <div className="flex gap-3 overflow-x-auto pb-4 mb-8 scrollbar-hide">
           {CATEGORIES.map((cat) => (
             <button
@@ -94,7 +93,6 @@ export default function MusicDiscovery() {
           ))}
         </div>
 
-        {/* Horizontal track collection */}
         <div className="relative">
           <div className="flex gap-6 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-8">
             {TRACKS.map((track) => (
@@ -129,7 +127,6 @@ export default function MusicDiscovery() {
               </motion.div>
             ))}
           </div>
-          {/* Fade edges for scroll indication */}
           <div className="absolute inset-0 pointer-events-none gradient fade-start" />
           <div className="absolute inset-0 pointer-events-none gradient fade-end" />
         </div>

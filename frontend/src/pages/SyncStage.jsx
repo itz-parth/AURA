@@ -1,122 +1,131 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import ChatPanel from "../components/ChatPanel";
-import QueuePanel from "../components/QueuePanel";
-import StagePlayer from "../components/StagePlayer";
+import socket from "../socket";
+import { request } from "../services/api";
+import { useRoomPolling } from "../hooks/useRoomPolling";
+import { useStageSocket } from "../hooks/useStageSocket";
+import MobileTabBar from "../components/common/MobileTabBar";
+import StageHeader from "../components/stage/StageHeader";
+import StageBody from "../components/stage/StageBody";
 
 export default function SyncStage() {
   const { code } = useParams();
+  const navigate = useNavigate();
   const { token, user } = useAuth();
-  const [isHost, setIsHost] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const [state, setState] = useState(null);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [listenerCount, setListenerCount] = useState(0);
+  const [isMobile, setIsMobile] = useState(typeof window !== "undefined" && window.innerWidth < 1024);
   const playerRef = useRef(null);
-  const pollIntervalRef = useRef(null);
 
   useEffect(() => {
-    let mounted = true;
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-    async function init() {
-      try {
-        const res = await fetch(`http://localhost:8000/rooms/${code}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        if (!mounted) return;
-        setIsHost(data.room.host_id === user?.id);
-        setLoaded(true);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    init();
-
-    async function poll() {
-      if (!mounted) return;
-      try {
-        const res = await fetch(`http://localhost:8000/rooms/${code}/state`);
-        const data = await res.json();
-        if (!mounted) return;
-        setState(data);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    poll();
-    const interval = setInterval(poll, 3000);
-    pollIntervalRef.current = interval;
-
-    return () => {
-      mounted = false;
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current);
-      }
-    };
-  }, [code, token, user]);
+  const { state, setState, loaded, isHost } = useRoomPolling({
+    code,
+    token,
+    userId: user?.id,
+  });
+  const { connected } = useStageSocket({
+    socket,
+    code,
+    userId: user?.id,
+    setState,
+  });
 
   const handleYouTubeReady = (player) => {
     playerRef.current = player;
     if (state && state.now_playing) {
-      const p = player.internalPlayer;
+      const p = playerRef.current;
       p.loadVideoById(state.now_playing.videoId, state.elapsed_seconds);
     }
   };
 
-  useEffect(() => {
-    if (!state || !state.now_playing || !playerRef.current) return;
-    const p = playerRef.current.internalPlayer;
-    const currentVideoId = p.getVideoData ? p.getVideoData().video_id : null;
-    const currentTime = p.getCurrentTime ? p.getCurrentTime() : 0;
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(code);
+  };
 
-    if (state.now_playing.videoId !== currentVideoId) {
-      p.loadVideoById(state.now_playing.videoId, state.elapsed_seconds);
-    } else if (Math.abs(currentTime - state.elapsed_seconds) > 3) {
-      p.seekTo(state.elapsed_seconds);
+  const handleLeave = () => {
+    if (showLeaveConfirm) {
+      socket.disconnect();
+      navigate("/nexus");
+    } else {
+      setShowLeaveConfirm(true);
     }
-  }, [state]);
+  };
+
+  const handleAddToQueue = (track) => {
+    if (!isHost) return;
+    request(`/rooms/${code}/queue`, {
+      method: "POST",
+      body: track,
+      token,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        socket.emit("sync_queue", {
+          code,
+          user_id: user?.id,
+          queue: data.queue || [],
+          now_playing: data.now_playing || null,
+        });
+      })
+      .catch((err) => console.error(err));
+  };
 
   if (!loaded) return null;
 
   return (
-    <div className="min-h-screen bg-[#050505] p-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">Room #{code}</h1>
-            <p className="text-white/50 text-sm">
-              {isHost ? "You are the host" : "Guest"}
-            </p>
-          </div>
-          <div className="glass px-4 py-2 rounded-lg flex items-center gap-2 text-xs text-white/70">
-            <span className={isHost ? "bg-purple-500/20 text-purple-400" : "bg-white/10 text-white"}>
-              <span className={`w-2 h-2 rounded-full mr-2 ${isHost ? "bg-purple-500" : "bg-white"}`} />
-              {isHost ? "HOST" : "GUEST"}
-            </span>
-          </div>
-        </div>
+    <div className="min-h-screen bg-[#080A16] text-white overflow-hidden relative">
+      <div className="ambient-light" />
 
-        <div className="glass rounded-2xl p-6 shadow-2xl">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="lg:col-span-3 space-y-4">
-              <QueuePanel roomCode={code} isHost={isHost} />
-            </div>
-            <div className="lg:col-span-6 space-y-4">
-              <StagePlayer
-                roomCode={code}
-                isHost={isHost}
-                nowPlaying={state ? state.now_playing : null}
-                onReady={handleYouTubeReady}
-              />
-            </div>
-            <div className="lg:col-span-3 space-y-4">
-              <ChatPanel roomCode={code} />
-            </div>
-          </div>
+      <StageHeader
+        code={code}
+        connected={connected}
+        listenerCount={listenerCount}
+        handleCopyCode={handleCopyCode}
+        handleLeave={handleLeave}
+        showLeaveConfirm={showLeaveConfirm}
+      />
+
+      {showLeaveConfirm && (
+        <div className="fixed top-20 right-6 z-50 bg-white/5 backdrop-blur-md border border-white/10 rounded-lg p-3 text-xs text-white/80 shadow-lg animate-in fade-in slide-in-from-right-2 duration-200">
+          Click again to confirm leaving the room.
         </div>
-      </div>
+      )}
+
+      <main className="pt-24 pb-6 px-6 lg:px-12 max-w-7xl mx-auto relative z-10">
+        {isMobile ? (
+          <MobileTabBar
+            code={code}
+            isHost={isHost}
+            user={user}
+            socket={socket}
+            state={state}
+            listenerCount={listenerCount}
+            onListenerChange={setListenerCount}
+            onReady={handleYouTubeReady}
+            playerRef={playerRef}
+            onAddToQueue={handleAddToQueue}
+          />
+        ) : (
+          <StageBody
+            code={code}
+            isHost={isHost}
+            state={state}
+            user={user}
+            socket={socket}
+            listenerCount={listenerCount}
+            onListenerChange={setListenerCount}
+            playerRef={playerRef}
+            onReady={handleYouTubeReady}
+            handleAddToQueue={handleAddToQueue}
+          />
+        )}
+      </main>
     </div>
   );
 }

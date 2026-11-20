@@ -1,16 +1,10 @@
-import os
 import ssl
 from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
-from dotenv import load_dotenv
+
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 
-load_dotenv()
-
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql+asyncpg://postgres:postgres@localhost:5432/aura",
-)
+from app.core.config import DATABASE_URL
 
 # Normalize sync postgresql:// URL to async postgresql+asyncpg:// if needed
 if DATABASE_URL.startswith("postgresql://"):

@@ -11,8 +11,7 @@ import TrendingSocial from "../components/TrendingSocial";
 const HERO_ARTWORK = [
   {
     id: "main",
-    image:
-      "https://images.unsplash.com/photo-1493225253777-836379e98652?w=600&h=600&fit=crop",
+    image: "/nexus/hero-stage.webp",
     w: "w-64 h-64",
     top: "top-24",
     left: "left-1/2 -translate-x-1/2",
@@ -20,8 +19,7 @@ const HERO_ARTWORK = [
   },
   {
     id: "top-left",
-    image:
-      "https://images.unsplash.com/photo-1470225620779-d306dcc4205d?w=320&h=320&fit=crop",
+    image: "/nexus/hero-guitar-silhouette.webp",
     w: "w-40 h-40",
     top: "top-10 left-10",
     left: "",
@@ -29,8 +27,7 @@ const HERO_ARTWORK = [
   },
   {
     id: "top-right",
-    image:
-      "https://images.unsplash.com/photo-1511379938447-cd7fda5b91c8?w=320&h=320&fit=crop",
+    image: "/nexus/hero-concert-singer.webp",
     w: "w-40 h-40",
     top: "top-16 right-10",
     left: "",
@@ -38,8 +35,7 @@ const HERO_ARTWORK = [
   },
   {
     id: "bottom-left",
-    image:
-      "https://images.unsplash.com/photo-1459749411477-64901fa6d24e?w=280&h=280&fit=crop",
+    image: "/nexus/hero-band.webp",
     w: "w-32 h-32",
     top: "bottom-24 left-12",
     left: "",
@@ -47,8 +43,7 @@ const HERO_ARTWORK = [
   },
   {
     id: "bottom-right",
-    image:
-      "https://images.unsplash.com/photo-1507544847470-9391c684604c?w=300&h=300&fit=crop",
+    image: "/nexus/hero-festival.webp",
     w: "w-48 h-48",
     top: "bottom-20 right-12",
     left: "",
@@ -63,10 +58,8 @@ export default function Nexus() {
 
   return (
     <div className="min-h-screen relative overflow-hidden text-white">
-      {/* Ambient lighting background */}
       <div className="ambient-light" />
 
-      {/* Decorative floating orbs */}
       <div
         className="absolute top-1/4 left-1/4 w-96 h-96 bg-aura-pink/20 rounded-full blur-3xl floating"
         style={{ animationDelay: "0s" }}
@@ -81,9 +74,7 @@ export default function Nexus() {
       />
 
       <main className="relative z-10 pt-20 pb-32 px-6 lg:px-12">
-        {/* Hero section */}
         <section className="relative max-w-7xl mx-auto min-h-[70vh] flex flex-col lg:flex-row items-center justify-between gap-12 px-4 lg:px-0">
-          {/* Left: text content */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -116,7 +107,6 @@ export default function Nexus() {
             </div>
           </motion.div>
 
-          {/* Right: artwork composition */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -149,22 +139,17 @@ export default function Nexus() {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#080A16]/80 to-transparent opacity-60" />
               </motion.div>
             ))}
-            {/* Central glowing accent */}
             <div className="absolute w-20 h-20 rounded-full bg-gradient-to-tr from-aura-pink to-aura-purple opacity-80 blur-xl animate-pulse" />
           </motion.div>
         </section>
 
-        {/* Music discovery section */}
         <MusicDiscovery />
 
-        {/* Trending + social listening preview */}
         <TrendingSocial />
       </main>
 
-      {/* Floating navigation dock */}
       <FloatingDock active={location.pathname} />
 
-      {/* Join the Frequency modal */}
       <JoinFrequencyModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}

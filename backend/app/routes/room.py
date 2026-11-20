@@ -1,6 +1,6 @@
 import time
 from fastapi import APIRouter, Depends, HTTPException
-from app.api.auth import get_current_user
+from app.routes.auth import get_current_user
 from app.store import ROOMS, generate_code, new_room
 
 router = APIRouter()
@@ -35,7 +35,6 @@ async def get_room_state(code: str):
         elapsed = time.time() - room["start_time"]
         duration = room["now_playing"].get("duration", 0)
         if elapsed >= duration:
-            room["queue"].pop(0)
             room["now_playing"] = room["queue"].pop(0) if room["queue"] else None
             if room["now_playing"] is not None:
                 room["start_time"] = time.time()

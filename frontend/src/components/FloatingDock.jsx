@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Home,
   Compass,
@@ -19,6 +19,7 @@ const DOCK_ITEMS = [
 
 export default function FloatingDock() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [hovered, setHovered] = useState(null);
 
   const isActive = (item) => {
@@ -52,7 +53,7 @@ export default function FloatingDock() {
             key={item.id}
             onClick={() => {
               if (item.path !== location.pathname) {
-                window.location.href = item.path;
+                navigate(item.path);
               }
             }}
             className="relative w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 group"

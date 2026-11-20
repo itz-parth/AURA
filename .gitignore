@@ -9,6 +9,11 @@
 *.temp
 .cache/
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
 # Playwright / session data
 .playwright-mcp/
 playwright-report/

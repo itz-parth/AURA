@@ -6,21 +6,21 @@ const TRENDING = [
     id: 1,
     title: "Chill Vibes 2024",
     subtitle: "Lo-fi beats for late nights",
-    image: "https://images.unsplash.com/photo-1459749411477-64901fa6d24e?w=600&h=300&fit=crop",
+    image: "/nexus/trending-sheet-music.webp",
     listeners: "12.4K listening",
   },
   {
     id: 2,
     title: "Pop Hits",
     subtitle: "Today's biggest tracks",
-    image: "https://images.unsplash.com/photo-1493225253777-836379e98652?w=600&h=300&fit=crop",
+    image: "/nexus/trending-microphone.webp",
     listeners: "8.9K listening",
   },
   {
     id: 3,
     title: "Indie Discoveries",
     subtitle: "Fresh indie releases",
-    image: "https://images.unsplash.com/photo-1511379938447-cd7fda5b91c8?w=600&h=300&fit=crop",
+    image: "/nexus/trending-live-stage.webp",
     listeners: "5.2K listening",
   },
 ];
@@ -28,21 +28,21 @@ const TRENDING = [
 const SOCIAL = [
   {
     id: 1,
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
+    avatar: "/nexus/avatar-alex.webp",
     name: "Alex",
     action: "is listening to Pop Hits",
     room: "Room #8421",
   },
   {
     id: 2,
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop",
+    avatar: "/nexus/avatar-sam-jordan.webp",
     name: "Sam & Jordan",
     action: "are hanging out in a room",
     room: "Room #9102",
   },
   {
     id: 3,
-    avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf378f37?w=100&h=100&fit=crop",
+    avatar: "/nexus/avatar-casey.webp",
     name: "Casey",
     action: "is listening to an R&B playlist",
     room: "Room #3374",
@@ -53,7 +53,6 @@ export default function TrendingSocial() {
   return (
     <section className="py-20 px-6 lg:px-12 relative">
       <div className="max-w-7xl mx-auto">
-        {/* Trending section */}
         <div className="mb-16">
           <div className="flex items-center justify-between gap-6 mb-8">
             <h2 className="text-3xl font-bold tracking-tight">
@@ -91,7 +90,6 @@ export default function TrendingSocial() {
           </div>
         </div>
 
-        {/* Social listening preview */}
         <div className="glass rounded-3xl p-8 lg:p-12 border-white/12">
           <div className="flex items-center justify-between gap-6 mb-10">
             <div>
