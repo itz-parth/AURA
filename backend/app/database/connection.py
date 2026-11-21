@@ -6,12 +6,9 @@ from sqlalchemy.orm import declarative_base
 
 from app.core.config import DATABASE_URL
 
-# Normalize sync postgresql:// URL to async postgresql+asyncpg:// if needed
 if DATABASE_URL.startswith("postgresql://"):
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
 
-# asyncpg doesn't accept sslmode/channel_binding query params;
-# strip them and enable SSL via connect_args for Neon/hosted Postgres
 parsed = urlparse(DATABASE_URL)
 query = dict(parse_qsl(parsed.query))
 for key in ("sslmode", "channel_binding"):

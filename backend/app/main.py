@@ -41,39 +41,4 @@ fastapi_app.include_router(room.router, prefix="/rooms")
 fastapi_app.include_router(music.router, prefix="/music")
 
 # Socket.IO ASGI app wraps the FastAPI app
-class CORSMiddlewareWrapper:
-    def __init__(self, app):
-        self.app = app
-
-    async def __call__(self, scope, receive, send):
-        if scope["type"] == "http":
-            async def send_with_cors(message):
-                if message["type"] == "http.response.start":
-                    headers = dict(message.get("headers", []))
-                    headers[b"access-control-allow-origin"] = b"*"
-                    headers[b"access-control-allow-methods"] = b"GET, POST, PUT, DELETE, OPTIONS"
-                    headers[b"access-control-allow-headers"] = b"Content-Type, Authorization"
-                    headers[b"access-control-allow-credentials"] = b"true"
-                    message["headers"] = list(headers.items())
-                await send(message)
-
-            if scope["method"] == "OPTIONS":
-                await send({
-                    "type": "http.response.start",
-                    "status": 204,
-                    "headers": [
-                        (b"access-control-allow-origin", b"*"),
-                        (b"access-control-allow-methods", b"GET, POST, PUT, DELETE, OPTIONS"),
-                        (b"access-control-allow-headers", b"Content-Type, Authorization"),
-                        (b"access-control-allow-credentials", b"true"),
-                        (b"content-length", b"0"),
-                    ],
-                })
-                await send({"type": "http.response.body", "body": b"", "more_body": False})
-                return
-
-            await self.app(scope, receive, send_with_cors)
-        else:
-            await self.app(scope, receive, send)
-
-app = CORSMiddlewareWrapper(socketio.ASGIApp(sio, fastapi_app))
+app = socketio.ASGIApp(sio, fastapi_app)

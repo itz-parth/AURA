@@ -16,11 +16,6 @@ async def connect(sid, environ, auth):
 @sio.event
 async def disconnect(sid):
     code = SID_ROOMS.pop(sid, None)
-    if code and code in ROOMS:
-        room = ROOMS[code]
-        if not any(v == code for v in SID_ROOMS.values()):
-            # Room is empty, let the cleanup loop handle it
-            pass
     print(f"Socket disconnected: {sid}")
 
 

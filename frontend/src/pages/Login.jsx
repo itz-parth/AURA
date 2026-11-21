@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { AlertCircle, ArrowRight, Eye, EyeOff, LoaderCircle, LockKeyhole, UserRound } from "lucide-react";
+import { AlertCircle, ArrowRight, Eye, EyeOff, LoaderCircle, LockKeyhole } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { request } from "../services/api";
 import AuthShell from "../components/AuthShell";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -23,11 +22,11 @@ export default function Login() {
     try {
       const res = await request("/auth/login", {
         method: "POST",
-        body: { username, email, password },
+        body: { email, password },
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Login failed");
-      login(data.access_token, { id: data.id, username: data.username || username, email: data.email || email });
+      login(data.access_token, { id: data.id, email: data.email });
       navigate("/nexus");
     } catch (err) {
       setError(err.message || "We couldn't tune you in. Please try again.");
@@ -52,13 +51,6 @@ export default function Login() {
       )}
 
       <form onSubmit={handleSubmit} className="auth-form" noValidate>
-        <div className="auth-field">
-          <label htmlFor="login-username">Username</label>
-          <div className="auth-input-wrap">
-            <UserRound size={17} />
-            <input id="login-username" name="username" autoComplete="username" placeholder="Your AURA username" value={username} onChange={(e) => setUsername(e.target.value)} required />
-          </div>
-        </div>
         <div className="auth-field">
           <label htmlFor="login-email">Email</label>
           <div className="auth-input-wrap">

@@ -24,14 +24,13 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        email = payload.get("sub")
+        if email is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
     async with async_session() as session:
-        result = await session.execute(select(User).where(User.username == username))
-        user = result.scalar_one_or_none()
+        user = await session.scalar(select(User).where(User.email == email))
         if user is None:
             raise credentials_exception
         return user
@@ -60,17 +59,16 @@ async def register(req: RegisterRequest):
 @router.post("/login")
 async def login(req: LoginRequest):
     async with async_session() as session:
-        result = await session.execute(select(User).where(User.username == req.username))
+        result = await session.execute(select(User).where(User.email == req.email))
         user = result.scalar_one_or_none()
         if not user or not verify_password(req.password, user.hashed_password):
             raise HTTPException(
-                status_code=400, detail="Incorrect username or password"
+                status_code=400, detail="Incorrect email or password"
             )
-        access_token = create_access_token(data={"sub": user.username})
+        access_token = create_access_token(data={"sub": user.email})
         return {
             "access_token": access_token,
             "token_type": "bearer",
             "id": str(user.id),
-            "username": user.username,
             "email": user.email,
         }
